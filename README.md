@@ -243,7 +243,7 @@ Contributions are welcome! Please follow these steps to contribute to the projec
 
 ## License
 
-This project is licensed under the [MIT License](https://github.com/Abo5/modern-blog-platform/LICENSE). You are free to use, modify, and distribute this software as per the terms of the license.
+This project is licensed under the [MIT License]([https://github.com/Abo5/modern-blog-platform/LICENSE](https://github.com/Abo5/modern-blog-platform-ruby-on-rails/blob/main/LICENSE)). You are free to use, modify, and distribute this software as per the terms of the license.
 
 ## Contact
 
