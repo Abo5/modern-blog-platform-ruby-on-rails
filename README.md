@@ -251,7 +251,7 @@ For any inquiries or support, please contact:
 
 - **Name**: Maven
 - **Email**: aszda44@gmail.com
-- **GitHub**: [my_username](https://github.com/Abo5)
+- **GitHub**: [my_account](https://github.com/Abo5)
 - **LinkedIn**: [my LinkedIn Profile](https://www.linkedin.com/in/abdullah-saleh-424bb9307)
 
 # modern-blog-platform-ruby-on-rails
