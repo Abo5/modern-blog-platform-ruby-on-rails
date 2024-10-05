@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Blog Platform</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <%= stylesheet_link_tag "style" %>
+  <%= javascript_include_tag('script') %>
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar" id="sidebar">
+      <div>
+        <div class="sidebar-header">
+          <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- أيقونة الشريط الجانبي -->
+            <circle cx="12" cy="12" r="10" stroke-width="2" stroke="var(--primary-color)" fill="none"/>
+            <path d="M12 6v6l4 2" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="sidebar-title">Blog Dashboard</span>
+          <button class="sidebar-close" id="sidebarClose">&times;</button> <!-- زر الإغلاق -->
+        </div>
+        <ul class="sidebar-menu">
+          <li>
+            <a href="#">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+              </svg>
+              <span class="sidebar-text">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+              </svg>
+              <span class="sidebar-text">Articles</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zM21 10a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+              </svg>
+              <span class="sidebar-text">Authors</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <span class="sidebar-text">Settings</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="user-section">
+        <div class="user-avatar"><%= current_user.initial%></div>
+        <div class="user-info">
+          <h1><%= current_user.fullname %></h1>
+          <p><%= current_user.email %></p>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="header">
+        <button class="menu-toggle" id="menuToggle">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <div class="user-section-header">
+          <div class="user-avatar"><%= current_user.initial%></div>
+          <div class="user-info-main">
+            <h1>Welcome back, <%= current_user.firstname %></h1>
+            <p><%= Time.now.strftime("%A, %d %B %Y") %></p>
+
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-primary" id="newArticleBtn">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span class="sidebar-text">New Article</span>
+          </button>
+          <%= button_to destroy_user_session_path, method: :delete, class: 'btn btn-secondary' do %>
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            <span class="sidebar-text">Log Out</span>
+          <% end %>
+        </div>
+      </header>
+
+      <div class="content-header">
+        <div class="welcome-message">Your Articles</div> <!-- الكلمة الترحيبية المضافة في الرأس -->
+        <div class="header-actions-content">
+          <div class="view-options">
+            <button class="view-btn active" id="gridViewBtn" aria-label="Grid View">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/>
+              </svg>
+            </button>
+            <button class="view-btn" id="listViewBtn" aria-label="List View">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M4 5a1 1 0 011-1h14a1 1 0 110 2H5a1 1 0 01-1-1zm0 7a1 1 0 011-1h14a1 1 0 110 2H5a1 1 0 01-1-1zm0 7a1 1 0 011-1h14a1 1 0 110 2H5a1 1 0 01-1-1z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+<div class="articles-grid grid-view" id="articlesContainer">
+  <% @blog_articles.each do |article| %>
+    <article class="article-card">
+      <div class="article-header">
+        <span class="article-date"><%= article.created_at.strftime('%b %d, %Y') %></span>
+        <span class="article-category"><%= article.category || 'Uncategorized' %></span>
+      </div>
+      <div class="article-content">
+        <h3 class="article-title"><%= article.short_title %></h3>
+        <p class="article-excerpt"><%= truncate(article.content, length: 120) %></p>
+      </div>
+      <div class="article-footer">
+        <div class="article-author">
+          <div class="author-avatar"><%= article.initial || article.publisher.first.upcase %></div>
+          <div class="author-info">
+            <span class="author-name"><%= article.name || article.publisher %></span>
+            <span class="author-role"><%= article.logo %></span>
+          </div>
+        </div>
+        <div class="article-actions">
+          <button class="action-btn edit-btn" data-id="<%= article.id %>" aria-label="Edit Article">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+          </button>
+          <button class="action-btn delete-btn" data-id="<%= article.id %>" aria-label="Delete Article">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </article>
+  <% end %>
+    </main>
+  </div>
+
+  <aside class="new-article-sidebar" id="newArticleSidebar">
+    <div class="new-article-sidebar-header">
+      <h2>New Article</h2>
+      <button class="close-btn" id="closeNewArticleSidebar">&times;</button>
+    </div>
+    <div class="new-article-sidebar-content">
+      <!-- النموذج سيكون هنا -->
+    </div>
+  </aside>
+</body>
+</html>

@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Blog Platform</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    :root {
+      --primary-color: #4F46E5; /* Indigo-600 */
+      --primary-dark: #4338CA; /* Indigo-700 */
+      --secondary-color: #F3F4F6; /* Gray-100 */
+      --accent-color: #F59E0B; /* Amber-500 */
+      --text-primary: #111827; /* Gray-900 */
+      --text-secondary: #6B7280; /* Gray-500 */
+      --background: #FFFFFF;
+      --card-background: #FFFFFF;
+      --border-radius: 8px;
+      --transition: all 0.3s ease;
+      --sidebar-width-expanded: 250px;
+      --sidebar-width-collapsed: 60px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--background);
+      color: var(--text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .main-content {
+      flex-grow: 1;
+      margin-left: var(--sidebar-width-collapsed);
+      padding: 2rem;
+      transition: var(--transition);
+    }
+
+    /* حالة توسعة الشريط الجانبي */
+    .main-content.sidebar-expanded {
+      margin-left: var(--sidebar-width-expanded);
+    }
+
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: var(--sidebar-width-collapsed);
+      height: 100vh;
+      background-color: var(--background);
+      color: var(--text-primary);
+      padding: 2rem 1rem;
+      transition: var(--transition);
+      z-index: 1000;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* توسيع الشريط الجانبي عند التحويم أو عند إضافة فئة 'open' */
+    .sidebar:hover,
+    .sidebar.hovered,
+    .sidebar.open {
+      width: var(--sidebar-width-expanded);
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin-bottom: 2rem;
+    }
+
+    .sidebar-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    /* تعديل قواعد .sidebar-text لتستهدف فقط داخل الشريط الجانبي */
+    .sidebar .sidebar-text {
+      white-space: nowrap;
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .sidebar:hover .sidebar-title,
+    .sidebar.hovered .sidebar-title,
+    .sidebar.open .sidebar-title {
+      opacity: 1;
+      margin-left: 1rem;
+    }
+
+    .sidebar:hover .sidebar-text,
+    .sidebar.hovered .sidebar-text,
+    .sidebar.open .sidebar-text {
+      opacity: 1;
+    }
+
+    .sidebar-close {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .sidebar.open .sidebar-close {
+      display: block;
+      margin-left: auto;
+    }
+
+    .sidebar-menu {
+      list-style-type: none;
+      flex-grow: 1;
+    }
+
+    .sidebar-menu li {
+      margin-bottom: 1rem;
+    }
+
+    .sidebar-menu a {
+      color: var(--text-primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      padding: 0.5rem;
+      border-radius: var(--border-radius);
+      transition: var(--transition);
+    }
+
+    .sidebar-menu a:hover {
+      background-color: rgba(95, 67, 255, 0.228); /* استخدام اللون الأساسي مع الشفافية */
+    }
+
+    .sidebar-menu svg {
+      margin-right: 0.5rem;
+      min-width: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-primary);
+      margin-right: 1rem;
+    }
+
+    .user-section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex: 1; /* لملء المساحة المتاحة */
+      min-width: 200px; /* لمنع الانكماش الزائد */
+    }
+
+    .user-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 300;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .user-info-main {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .user-info-main h1 {
+      font-size: 1rem;
+      font-weight: 100;
+      color: var(--text-primary);
+    }
+
+    .user-info-main p {
+      color: var(--text-secondary);
+      font-size: 0.45rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      font-size: 0.875rem;
+      transition: var(--transition);
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background-color: var(--secondary-color);
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+      background-color: #e2e8f0;
+    }
+
+    .content-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .welcome-message {
+      font-size: 1.25rem; /* حجم الخط متوسط */
+      font-weight: 500;   /* وزن الخط متوسط */
+      color: var(--text-primary);
+      margin-bottom: 0.5rem; /* مسافة أسفل الكلمة */
+      flex: 1; /* لملء المساحة المتاحة */
+      min-width: 200px; /* لمنع الانكماش الزائد */
+    }
+
+    .content-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem; /* مسافة أسفل العنوان */
+    }
+
+    .view-options {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem; /* إضافة مسافة فوق خيارات العرض */
+    }
+
+    /* أزرار العرض النشطة */
+    .view-btn.active {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .view-btn {
+      padding: 0.5rem;
+      border-radius: var(--border-radius);
+      border: none;
+      background: var(--secondary-color);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .view-btn:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    /* عرض البطاقة (Grid View) */
+    .articles-grid.grid-view {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+      transition: var(--transition);
+    }
+
+    /* العرض السردي (List View) */
+    .articles-grid.list-view {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      transition: var(--transition);
+    }
+
+    /* تعديل تخطيط المقالات عند توسعة الشريط الجانبي */
+    .main-content.sidebar-expanded .articles-grid.grid-view {
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+
+    /* تعديل تخطيط المقالات عند العرض السردي */
+    .articles-grid.list-view .article-card {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+    }
+
+    .articles-grid.list-view .article-content {
+      flex: 1;
+      padding: 1rem 1.5rem;
+    }
+
+    .articles-grid.list-view .article-header,
+    .articles-grid.list-view .article-footer {
+      padding: 1rem 1.5rem;
+    }
+
+    .articles-grid.list-view .article-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .articles-grid.list-view .article-category {
+      margin-top: 0.5rem;
+    }
+
+    /* تعديل تخطيط المقالات في عرض البطاقة لتثبيت الأزرار في الأسفل */
+    .articles-grid.grid-view .article-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    /* التأكد من أن المحتوى يأخذ المساحة المتبقية */
+    .articles-grid.grid-view .article-content {
+      flex-grow: 1;
+    }
+
+    .articles-grid.grid-view .article-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .articles-grid.list-view .article-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .articles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+      transition: var(--transition);
+    }
+
+    .article-card {
+      background: var(--card-background);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .article-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .article-header {
+      padding: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .article-date {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .article-category {
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      background-color: var(--secondary-color);
+    }
+
+    .article-content {
+      padding: 0 1.5rem 1.5rem;
+    }
+
+    .article-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+
+    .article-excerpt {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .article-footer {
+      padding: 1.5rem;
+      border-top: 1px solid var(--secondary-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .article-author {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .author-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--accent-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    .author-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .author-name {
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    .author-role {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .article-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .action-btn {
+      padding: 0.5rem;
+      border-radius: var(--border-radius);
+      border: none;
+      background: var(--secondary-color);
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--text-secondary);
+    }
+
+    .action-btn:hover {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .new-article-sidebar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 400px;
+      height: 100vh;
+      background: var(--background);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      transform: translateX(100%);
+      transition: var(--transition);
+      z-index: 1000;
+      padding: 2rem;
+    }
+
+    .new-article-sidebar.open {
+      transform: translateX(0);
+    }
+
+    .new-article-sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+
+    .close-btn:hover {
+      color: var(--text-primary);
+    }
+
+    /* التعديلات لإخفاء وعرض معلومات المستخدم */
+    /* إخفاء معلومات المستخدم بشكل افتراضي */
+    .sidebar .user-info {
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity 0.3s ease, max-height 0.3s ease;
+    }
+
+    /* إظهار معلومات المستخدم عند توسيع الشريط الجانبي */
+    .sidebar:hover .user-info,
+    .sidebar.hovered .user-info,
+    .sidebar.open .user-info {
+      opacity: 1;
+      max-height: 100px; /* قيمة كافية لعرض الاسم والإيميل */
+    }
+
+    /* تعديل تنسيق user-section */
+    .user-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: gap 0.3s ease;
+    }
+
+    /* لضمان تنسيق جيد عند التوسعة والانكماش */
+    .sidebar.collapsed .user-section {
+      gap: 0;
+    }
+
+    @media (max-width: 1024px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: var(--sidebar-width-collapsed);
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      .sidebar-close {
+        display: block;
+      }
+
+      .main-content.sidebar-expanded {
+        margin-left: var(--sidebar-width-expanded);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .header-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .articles-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .new-article-sidebar {
+        width: 100%;
+      }
+
+      /* عرض سردي على الشاشات الصغيرة */
+      .articles-grid.list-view .article-card {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar" id="sidebar">
+      <div>
+        <div class="sidebar-header">
+          <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- أيقونة الشريط الجانبي -->
+            <circle cx="12" cy="12" r="10" stroke-width="2" stroke="var(--primary-color)" fill="none"/>
+            <path d="M12 6v6l4 2" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="sidebar-title">Blog Dashboard</span>
+          <button class="sidebar-close" id="sidebarClose">&times;</button> <!-- زر الإغلاق -->
+        </div>
+        <ul class="sidebar-menu">
+          <li>
+            <a href="#">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+              </svg>
+              <span class="sidebar-text">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+              </svg>
+              <span class="sidebar-text">Articles</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zM21 10a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+              </svg>
+              <span class="sidebar-text">Authors</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <span class="sidebar-text">Settings</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="user-section">
+        <div class="user-avatar">J</div>
+        <div class="user-info">
+          <h1>John Doe</h1>
+          <p>johndoe@example.com</p>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="header">
+        <button class="menu-toggle" id="menuToggle">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <div class="user-section-header">
+          <div class="user-avatar">J</div>
+          <div class="user-info-main">
+            <h1>Welcome back, John</h1>
+            <p>Monday, 4 March 2024</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-primary" id="newArticleBtn">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span class="sidebar-text">New Article</span>
+          </button>
+          <button class="btn btn-secondary">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            <span class="sidebar-text">Log Out</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="content-header">
+        <div class="welcome-message">Welcome Back</div> <!-- الكلمة الترحيبية المضافة في الرأس -->
+        <div class="header-actions-content">
+          <h2 class="content-title">Your Articles</h2>
+          <div class="view-options">
+            <button class="view-btn active" id="gridViewBtn" aria-label="Grid View">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/>
+              </svg>
+            </button>
+            <button class="view-btn" id="listViewBtn" aria-label="List View">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M4 5a1 1 0 011-1h14a1 1 0 110 2H5a1 1 0 01-1-1zm0 7a1 1 0 011-1h14a1 1 0 110 2H5a1 1 0 01-1-1zm0 7a1 1 0 011-1h14a1 1 0 110 2H5a1 1 0 01-1-1z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="articles-grid grid-view" id="articlesContainer">
+        <!-- سيتم إضافة المقالات ديناميكيًا هنا -->
+      </div>
+    </main>
+  </div>
+
+  <aside class="new-article-sidebar" id="newArticleSidebar">
+    <div class="new-article-sidebar-header">
+      <h2>New Article</h2>
+      <button class="close-btn" id="closeNewArticleSidebar">&times;</button>
+    </div>
+    <div class="new-article-sidebar-content">
+      <!-- النموذج سيكون هنا -->
+    </div>
+  </aside>
+
+  <script>
+    const articles = [
+      {
+        id: 1,
+        date: 'Mar 4, 2024',
+        category: 'Technology',
+        title: 'The Future of Web Development',
+        excerpt: 'Exploring the latest trends and technologies shaping the future of web development, from WebAssembly to Edge Computing.',
+        author: {
+          name: 'John Doe',
+          role: 'Senior Developer',
+          initial: 'J'
+        }
+      },
+      {
+        id: 2,
+        date: 'Mar 3, 2024',
+        category: 'Design',
+        title: 'UI Design Best Practices',
+        excerpt: 'Learn the essential principles and best practices for creating intuitive and visually appealing user interfaces.',
+        author: {
+          name: 'Sarah Johnson',
+          role: 'UI Designer',
+          initial: 'S'
+        }
+      },
+      {
+        id: 3,
+        date: 'Mar 2, 2024',
+        category: 'Tutorial',
+        title: 'Getting Started with React',
+        excerpt: 'A comprehensive guide to building modern web applications using React, from setup to advanced concepts.',
+        author: {
+          name: 'Mike Wilson',
+          role: 'Frontend Developer',
+          initial: 'M'
+        }
+      },
+      {
+        id: 3,
+        date: 'Mar 2, 2024',
+        category: 'Tutorial',
+        title: 'Getting Started with React',
+        excerpt: 'A comprehensive guide to building modern web applications using React, from setup to advanced concepts.',
+        author: {
+          name: 'Mike Wilson',
+          role: 'Frontend Developer',
+          initial: 'M'
+        }
+      }
+    ];
+
+    function createArticleCard(article) {
+      return `
+        <article class="article-card">
+          <div class="article-header">
+            <span class="article-date">${article.date}</span>
+            <span class="article-category">${article.category}</span>
+          </div>
+          <div class="article-content">
+            <h3 class="article-title">${article.title}</h3>
+            <p class="article-excerpt">${article.excerpt}</p>
+          </div>
+          <div class="article-footer">
+            <div class="article-author">
+              <div class="author-avatar">${article.author.initial}</div>
+              <div class="author-info">
+                <span class="author-name">${article.author.name}</span>
+                <span class="author-role">${article.author.role}</span>
+              </div>
+            </div>
+            <div class="article-actions">
+              <button class="action-btn edit-btn" data-id="${article.id}" aria-label="Edit Article">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+              </button>
+              <button class="action-btn delete-btn" data-id="${article.id}" aria-label="Delete Article">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderArticles() {
+      const articlesContainer = document.getElementById('articlesContainer');
+      articlesContainer.innerHTML = articles.map(createArticleCard).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderArticles();
+
+      const newArticleBtn = document.getElementById('newArticleBtn');
+      const newArticleSidebar = document.getElementById('newArticleSidebar');
+      const closeNewArticleSidebarBtn = document.getElementById('closeNewArticleSidebar');
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarClose = document.getElementById('sidebarClose');
+      const mainContent = document.querySelector('.main-content');
+      
+      // أزرار تغيير العرض
+      const gridViewBtn = document.getElementById('gridViewBtn');
+      const listViewBtn = document.getElementById('listViewBtn');
+      const articlesGrid = document.getElementById('articlesContainer');
+
+      newArticleBtn.addEventListener('click', () => {
+        newArticleSidebar.classList.add('open');
+      });
+
+      closeNewArticleSidebarBtn.addEventListener('click', () => {
+        newArticleSidebar.classList.remove('open');
+      });
+
+      menuToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        mainContent.classList.toggle('sidebar-expanded');
+      });
+
+      sidebarClose.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        mainContent.classList.remove('sidebar-expanded');
+      });
+
+      // إضافة مستمعي أحداث للماوس لتوسيع الشريط الجانبي عند المرور بالماوس
+      sidebar.addEventListener('mouseenter', () => {
+        sidebar.classList.add('hovered');
+        mainContent.classList.add('sidebar-expanded');
+      });
+
+      sidebar.addEventListener('mouseleave', () => {
+        sidebar.classList.remove('hovered');
+        // فقط إزالة الفئة إذا لم يكن الشريط الجانبي مفتوحًا بواسطة الزر
+        if (!sidebar.classList.contains('open')) {
+          mainContent.classList.remove('sidebar-expanded');
+        }
+      });
+
+      // مستمعي أحداث لأزرار تغيير العرض
+      gridViewBtn.addEventListener('click', () => {
+        articlesGrid.classList.remove('list-view');
+        articlesGrid.classList.add('grid-view');
+        gridViewBtn.classList.add('active');
+        listViewBtn.classList.remove('active');
+      });
+
+      listViewBtn.addEventListener('click', () => {
+        articlesGrid.classList.remove('grid-view');
+        articlesGrid.classList.add('list-view');
+        listViewBtn.classList.add('active');
+        gridViewBtn.classList.remove('active');
+      });
+
+      // إضافة مستمعي أحداث لأزرار التعديل والحذف
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('.edit-btn')) {
+          const articleId = e.target.closest('.edit-btn').dataset.id;
+          console.log('Edit article', articleId);
+          // تنفيذ وظيفة التعديل
+        } else if (e.target.closest('.delete-btn')) {
+          const articleId = e.target.closest('.delete-btn').dataset.id;
+          console.log('Delete article', articleId);
+          // تنفيذ وظيفة الحذف
+        }
+      });
+    });
+
+    // الرسوم المتحركة
+    gsap.from('.article-card', {
+      duration: 0.6,
+      y: 50,
+      opacity: 0,
+      stagger: 0.1,
+      ease: 'power2.out'
+    });
+  </script>
+</body>
+</html>

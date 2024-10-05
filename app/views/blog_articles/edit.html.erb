@@ -1,0 +1,15 @@
+<%# app/views/blog_articles/edit.html.erb %>
+<%= turbo_frame_tag "newArticleSidebar" do %>
+  <button class="close-btn" id="closeNewArticleSidebar">&times;</button>
+
+  <h1>Editing blog article</h1>
+
+  <%= render "form", blog_article: @blog_article %>
+
+  <br>
+
+  <div>
+    <%# <%= link_to "Show this blog article", @blog_article %>  
+    <%# <%= link_to "Back to blog articles", blog_articles_path %> 
+  </div>
+<% end %>

@@ -1,0 +1,628 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #4F46E5; /* Indigo-600 */
+  --primary-dark: #4338CA; /* Indigo-700 */
+  --secondary-color: #F3F4F6; /* Gray-100 */
+  --accent-color: #F59E0B; /* Amber-500 */
+  --text-primary: #111827; /* Gray-900 */
+  --text-secondary: #6B7280; /* Gray-500 */
+  --background: #FFFFFF;
+  --card-background: #FFFFFF;
+  --border-radius: 8px;
+  --transition: all 0.3s ease;
+  --sidebar-width-expanded: 250px;
+  --sidebar-width-collapsed: 60px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--background);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex-grow: 1;
+  margin-left: var(--sidebar-width-collapsed);
+  padding: 2rem;
+  transition: var(--transition);
+}
+
+/* حالة توسعة الشريط الجانبي */
+.main-content.sidebar-expanded {
+  margin-left: var(--sidebar-width-expanded);
+}
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: var(--sidebar-width-collapsed);
+  height: 100vh;
+  background-color: var(--background);
+  color: var(--text-primary);
+  padding: 1rem 1rem;
+  transition: var(--transition);
+  z-index: 1000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+
+}
+
+/* توسيع الشريط الجانبي عند التحويم أو عند إضافة فئة 'open' */
+.sidebar:hover,
+.sidebar.hovered,
+.sidebar.open {
+  width: var(--sidebar-width-expanded);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 2rem;
+}
+
+.sidebar-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  opacity: 0;
+  transition: var(--transition);
+}
+
+/* تعديل قواعد .sidebar-text لتستهدف فقط داخل الشريط الجانبي */
+.sidebar .sidebar-text {
+  white-space: nowrap;
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.sidebar:hover .sidebar-title,
+.sidebar.hovered .sidebar-title,
+.sidebar.open .sidebar-title {
+  opacity: 1;
+  margin-left: 1rem;
+}
+
+.sidebar:hover .sidebar-text,
+.sidebar.hovered .sidebar-text,
+.sidebar.open .sidebar-text {
+  opacity: 1;
+}
+
+.sidebar-close {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.sidebar.open .sidebar-close {
+  display: block;
+  margin-left: auto;
+}
+
+.sidebar-menu {
+  list-style-type: none;
+  flex-grow: 1;
+}
+
+.sidebar-menu li {
+  margin-bottom: 1rem;
+}
+
+.sidebar-menu a {
+  color: var(--text-primary);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+}
+
+.sidebar-menu a:hover {
+  background-color: rgba(95, 67, 255, 0.228); /* استخدام اللون الأساسي مع الشفافية */
+}
+
+.sidebar-menu svg {
+  margin-right: 0.5rem;
+  min-width: 20px;
+  margin-left: -30px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-primary);
+  margin-right: 1rem;
+}
+
+.user-section-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1; /* لملء المساحة المتاحة */
+  min-width: 200px; /* لمنع الانكماش الزائد */
+}
+
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 300;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  margin-left: -10px;
+  margin-top: -20px;
+}
+
+.user-info-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.user-info-main h1 {
+  font-size: 1rem;
+  font-weight: 100;
+  color: var(--text-primary);
+}
+
+/* تغيير حجم النص للاسم والإيميل */
+.user-info h1 {
+    font-size: 0.875rem; /* تصغير حجم الخط */
+    font-weight: 600; /* تعديل وزن الخط */
+    color: var(--text-primary);
+  }
+  
+  .user-info p {
+    font-size: 0.75rem; /* تصغير حجم الخط للبريد الإلكتروني */
+    color: var(--text-secondary);
+  }
+  
+
+.user-info-main p {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: var(--transition);
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background-color: #e2e8f0;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.welcome-message {
+  font-size: 1.25rem; /* حجم الخط متوسط */
+  font-weight: 500;   /* وزن الخط متوسط */
+  color: var(--text-primary);
+  margin-bottom: 0.5rem; /* مسافة أسفل الكلمة */
+  flex: 1; /* لملء المساحة المتاحة */
+  min-width: 200px; /* لمنع الانكماش الزائد */
+}
+
+.content-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem; /* مسافة أسفل العنوان */
+}
+
+.view-options {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem; /* إضافة مسافة فوق خيارات العرض */
+}
+
+/* أزرار العرض النشطة */
+.view-btn.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+.view-btn {
+  padding: 0.5rem;
+  border-radius: var(--border-radius);
+  border: none;
+  background: var(--secondary-color);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.view-btn:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* عرض البطاقة (Grid View) */
+.articles-grid.grid-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  transition: var(--transition);
+}
+
+/* العرض السردي (List View) */
+.articles-grid.list-view {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  transition: var(--transition);
+}
+
+/* تعديل تخطيط المقالات عند توسعة الشريط الجانبي */
+.main-content.sidebar-expanded .articles-grid.grid-view {
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+/* تعديل تخطيط المقالات عند العرض السردي */
+.articles-grid.list-view .article-card {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.articles-grid.list-view .article-content {
+  flex: 1;
+  padding: 1rem 1.5rem;
+}
+
+.articles-grid.list-view .article-header,
+.articles-grid.list-view .article-footer {
+  padding: 1rem 1.5rem;
+}
+
+.articles-grid.list-view .article-header {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.articles-grid.list-view .article-category {
+  margin-top: 0.5rem;
+}
+
+/* تعديل تخطيط المقالات في عرض البطاقة لتثبيت الأزرار في الأسفل */
+.articles-grid.grid-view .article-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+/* التأكد من أن المحتوى يأخذ المساحة المتبقية */
+.articles-grid.grid-view .article-content {
+  flex-grow: 1;
+}
+
+.articles-grid.grid-view .article-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.articles-grid.list-view .article-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.articles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  transition: var(--transition);
+}
+
+.article-card {
+  background: var(--card-background);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.article-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.article-header {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.article-date {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.article-category {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  background-color: var(--secondary-color);
+}
+
+.article-content {
+  padding: 0 1.5rem 1.5rem;
+}
+
+.article-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.article-excerpt {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+}
+
+.article-footer {
+  padding: 1.5rem;
+  border-top: 1px solid var(--secondary-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.article-author {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.author-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.author-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.author-name {
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.author-role {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.article-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  padding: 0.5rem;
+  border-radius: var(--border-radius);
+  border: none;
+  background: var(--secondary-color);
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--text-secondary);
+}
+
+.action-btn:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.new-article-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100vh;
+  background: var(--background);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%);
+  transition: var(--transition);
+  z-index: 1000;
+  padding: 2rem;
+}
+
+.new-article-sidebar.open {
+  transform: translateX(0);
+}
+
+.new-article-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+.close-btn:hover {
+  color: var(--text-primary);
+}
+
+/* التعديلات لإخفاء وعرض معلومات المستخدم */
+/* إخفاء معلومات المستخدم بشكل افتراضي */
+.sidebar .user-info {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 0.3s ease, max-height 0.3s ease;
+}
+
+/* إظهار معلومات المستخدم عند توسيع الشريط الجانبي */
+.sidebar:hover .user-info,
+.sidebar.hovered .user-info,
+.sidebar.open .user-info {
+  opacity: 1;
+  max-height: 100px; /* قيمة كافية لعرض الاسم والإيميل */
+}
+
+/* تعديل تنسيق user-section */
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: gap 0.3s ease;
+}
+
+/* لضمان تنسيق جيد عند التوسعة والانكماش */
+.sidebar.collapsed .user-section {
+  gap: 0;
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .main-content {
+    .main-content {
+        margin-left: 0;
+        padding: 1rem;
+      }
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .sidebar-close {
+    display: block;
+  }
+
+  .main-content.sidebar-expanded {
+    margin-left: var(--sidebar-width-expanded);
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .articles-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .new-article-sidebar {
+    width: 100%;
+  }
+
+  /* عرض سردي على الشاشات الصغيرة */
+  .articles-grid.list-view .article-card {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Blog</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  
+  <%= stylesheet_link_tag "application", media: "all", 'data-turbolinks-track': "reload" %>
+  <%= javascript_include_tag "application", 'data-turbolinks-track': "reload" %>
+  
+  <style>
+    :root {
+      --primary-color: #6366f1;
+      --text-color: #1f2937;
+      --bg-color: #f9fafb;
+      --card-bg: #ffffff;
+      --sidebar-width: 80px;
+      --sidebar-expanded-width: 250px;
+      --transition-speed: 0.3s;
+    }
+    
+    body {
+      font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      direction: ltr;
+    }
+
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: var(--card-bg);
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+      transition: width var(--transition-speed) ease;
+      overflow: hidden;
+      z-index: 1000;
+    }
+
+    .sidebar:hover {
+      width: var(--sidebar-expanded-width);
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 2rem;
+      margin-left: var(--sidebar-width);
+      transition: margin-left var(--transition-speed) ease;
+    }
+
+    .sidebar:hover + .main-content {
+      margin-left: var(--sidebar-expanded-width);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding: 1rem;
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .articles-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .articles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .article-card {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .article-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+
+    .article-header {
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+
+    .article-content {
+      padding: 0 1rem 1rem;
+    }
+
+    .article-title {
+      margin: 0 0 0.5rem;
+      font-size: 1.25rem;
+      color: var(--text-color);
+    }
+
+    .article-excerpt {
+      color: #4b5563;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .article-footer {
+      padding: 1rem;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .article-author {
+      display: flex;
+      align-items: center;
+    }
+
+    .author-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .author-info {
+      margin-left: 0.75rem;
+    }
+
+    .author-name {
+      font-weight: 500;
+      display: block;
+    }
+
+    .author-role {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    .sidebar-header {
+      padding: 1.5rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-logo {
+      font-size: 1.5rem;
+      color: var(--primary-color);
+      transition: all var(--transition-speed);
+    }
+
+    .sidebar-title {
+      margin-left: 1rem;
+      opacity: 0;
+      transition: opacity var(--transition-speed);
+      white-space: nowrap;
+    }
+
+    .sidebar:hover .sidebar-title {
+      opacity: 1;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-menu li {
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-menu a {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      color: var(--text-color);
+      text-decoration: none;
+      transition: background-color 0.2s;
+    }
+
+    .sidebar-menu a:hover {
+      background-color: #f3f4f6;
+    }
+
+    .sidebar-menu .icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 1rem;
+    }
+
+    .sidebar-menu .text {
+      opacity: 0;
+      transition: opacity var(--transition-speed);
+      white-space: nowrap;
+    }
+
+    .sidebar:hover .sidebar-menu .text {
+      opacity: 1;
+    }
+
+    .search-form {
+      position: relative;
+      max-width: 300px;
+      width: 100%;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.5rem 2.5rem 0.5rem 1rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary-color);
+    }
+
+    .category-badge {
+      background-color: #e5e7eb;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .read-more-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .read-more-btn:hover {
+      background-color: #5258e9;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 0;
+      }
+
+      .sidebar:hover {
+        width: var(--sidebar-expanded-width);
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .mobile-menu-toggle {
+        display: block;
+      }
+    }
+
+    .bookmark-btn {
+      background: none;
+      border: none;
+      color: #6b7280;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .bookmark-btn:hover {
+      color: var(--primary-color);
+    }
+
+    .stats {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+
+    .stat-icon {
+      margin-left: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">📚</div>
+        <h1 class="sidebar-title">My Blog</h1>
+      </div>
+      <ul class="sidebar-menu">
+        <li>
+          <%= link_to "#" do %>
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
+            <span class="text">Home</span>
+          <% end %>
+        </li>
+        <li>
+          <%= link_to "#" do %>
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+            </svg>
+            <span class="text">Categories</span>
+          <% end %>
+        </li>
+        <li>
+          <%= link_to "#" do %>
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+            </svg>
+            <span class="text">Bookmarks</span>
+          <% end %>
+        </li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <header class="header">
+        <h1>Latest Articles</h1>
+        <%= form_tag "#", method: :get, class: "search-form" do %>
+          <%= text_field_tag :search, params[:search], placeholder: "Search articles...", class: "search-input" %>
+        <% end %>
+      </header>
+
+      <div class="articles-container">
+        <div class="articles-grid" id="articlesContainer">
+          <% @blog_articles.each do |article| %>
+            <article class="article-card">
+              <div class="article-header">
+                <span class="article-date"><%= article.created_at.strftime('%b %d, %Y') %></span>
+                <span class="category-badge"><%= article.category || 'Uncategorized' %></span>
+              </div>
+              <div class="article-content">
+                <h3 class="article-title"><%= article.short_title %></h3>
+                <p class="article-excerpt"><%= truncate(article.content, length: 120) %></p>
+              </div>
+              <div class="article-footer">
+                <div class="article-author">
+                  <div class="author-avatar"><%= article.initial || article.publisher.first.upcase %></div>
+                  <div class="author-info">
+                    <span class="author-name"><%= article.name || article.publisher %></span>
+                    <span class="author-role"><%= article.logo %></span>
+                  </div>
+                </div>
+                <div class="article-actions">
+                  <button class="bookmark-btn">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="stats">
+                <div class="stat-item">
+                  <svg class="stat-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  </svg>
+                  <%= rand(100..1000) %>
+                </div>
+                <div class="stat-item">
+                  <svg class="stat-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                  </svg>
+                  <%= rand(5..50) %>
+                </div>
+              </div>
+              <%= link_to "Read More", "#", class: "read-more-btn" %>
+            </article>
+          <% end %>
+          <div class="header-actions">
+          <%= button_to destroy_user_session_path, method: :delete, class: 'btn btn-secondary' do %>
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            <span class="sidebar-text">Log Out</span>
+          <% end %>
+        </div>
+      </header>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebar = document.querySelector('.sidebar');
+      const mainContent = document.querySelector('.main-content');
+      
+      // Smooth animation on page load
+      const articles = document.querySelectorAll('.article-card');
+      articles.forEach((article, index) => {
+        article.style.opacity = '0';
+        article.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          article.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+          article.style.opacity = '1';
+          article.style.transform = 'translateY(0)';
+        }, index * 100);
+      });
+
+      // Bookmark button functionality
+      const bookmarkBtns = document.querySelectorAll('.bookmark-btn');
+      bookmarkBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          this.classList.toggle('active');
+          if (this.classList.contains('active')) {
+            this.style.color = 'var(--primary-color)';
+          } else {
+            this.style.color = '#6b7280';
+          }
+        });
+      });
+
+      // Enhance search performance
+      const searchInput = document.querySelector('.search-input');
+      let searchTimeout;
+      searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          // Add actual search logic here
+          console.log('Searching for:', this.value);
+        }, 300);
+      });
+    });
+  </script>
+</body>
+</html>
